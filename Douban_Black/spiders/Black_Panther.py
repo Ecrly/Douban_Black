@@ -36,7 +36,7 @@ class Spider_Black(CrawlSpider):
             formdata = {
                 "source": "movie",
                 # "redir": "https://movie.douban.com/",
-                "form_email": "2846698558@qq.com",
+                "form_email": "1693348468@qq.com",
                 "form_password": "cl19961102",
                 "login":"登录",
             }
@@ -55,7 +55,7 @@ class Spider_Black(CrawlSpider):
             formdata = {
                 "source": "movie",
                 # "redir": "https://movie.douban.com/",
-                "form_email": "2846698558@qq.com",
+                "form_email": "1693348468@qq.com",
                 "form_password": "cl19961102",
                 "captcha-solution": captcha_solution,
                 "captcha-id": captcha_id,
@@ -90,7 +90,7 @@ class Spider_Black(CrawlSpider):
     # 由初始url分别进短评和长评
     def parse(self, response):
         print(response.meta['cookiejar'])
-        urls = ['https://movie.douban.com/subject/26972275/']
+        urls = []
         with open('start_urls.txt', 'r') as f:
             lines = f.readlines()
             for line in lines:
@@ -99,9 +99,23 @@ class Spider_Black(CrawlSpider):
         for url in urls:
             url_short = url + 'comments'
             url_long = url + 'reviews'
+            yield Request(url=url, callback=self.save_main)
             # 短评未登录只能访问10页，因此加上cookiejar
             yield Request(url=url_short,meta={"cookiejar": response.meta['cookiejar']}, callback=self.save_short)
             yield Request(url=url_long, callback=self.save_long)
+
+    # 保存主页
+    def save_main(self, response):
+        title = response.xpath(".//*[@id='content']/h1/span[1]/text()").extract()
+        if title:
+            title = title[0]
+            cwd = os.getcwd() + '/data/'
+            if not os.path.exists(cwd):
+                os.makedirs(cwd)
+            file = cwd + str(title) + '.html'
+            with open(file, 'wb') as f:
+                f.write(response.text.encode())
+
 
     # 处理短评
     def save_short(self, response):
@@ -123,7 +137,6 @@ class Spider_Black(CrawlSpider):
             next_url = response.url.split('?')[0] + next[0]
             yield Request(next_url, meta={"cookiejar": response.meta['cookiejar']}, callback=self.save_short)
 
-        time.sleep(random.randint(0, 1))
 
     # 处理长评
     def save_long(self, response):
@@ -147,5 +160,5 @@ class Spider_Black(CrawlSpider):
             next_url = response.url.split('?')[0] + next[0]
             yield Request(next_url, callback=self.save_long)
 
-        # time.sleep(random.randint(0, 1))
+
 

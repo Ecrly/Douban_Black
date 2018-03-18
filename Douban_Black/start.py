@@ -4,6 +4,7 @@ import json
 import re
 import time
 import random
+import csv
 
 
 # 记录文件中读取的电影名
@@ -34,7 +35,8 @@ def get_url():
         if re.match(r"https://movie.douban.com/subject/\d+/", movie_url):
             print(movie, movie_url)
             urls.add(movie_url)
-        time.sleep(1)
+        # API官方文档明确要求限速了
+        time.sleep(2)
         # break
 
 def parse(response):
@@ -54,6 +56,18 @@ def read_urls():
             line = line.strip('\n').strip(' ')
             urls.add(line)
 
+# ***********************************************************从csv文件中直接获取id**********************************
+
+def read_csv():
+    csv_reader = csv.reader(open('MoviesData.csv'))
+    base_url = "https://movie.douban.com/subject/"
+    for row in csv_reader:
+        if len(row) == 2:
+            url = base_url + str(row[1]).strip(' ') + '/'
+            urls.add(url)
+
+# ***********************************************************保存url**********************************
+
 def save_urls():
     with open('start_urls.txt', 'w') as f:
         for url in urls:
@@ -62,8 +76,10 @@ def save_urls():
     f.close()
 
 if __name__ == '__main__':
-    read_movies()
-    read_urls()
+    # read_movies()
+    # read_urls()
+    # save_urls()
+    # print(urls)
+    read_csv()
     save_urls()
-    print(urls)
     cmd.execute("scrapy crawl black_".split())

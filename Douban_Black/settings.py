@@ -31,6 +31,10 @@ ROBOTSTXT_OBEY = True
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
+# 延迟
+DOWNLOAD_DELAY = 2
+RANDOMIZE_DOWNLOAD_DELAY = True  # 使爬取时间间隔随机化，随机时长控制在0.5-1.5倍的DOWNLOAD_DELAY之间
+
 
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = True
